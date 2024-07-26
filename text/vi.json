@@ -1,0 +1,10 @@
+{
+    "name": "Tiếng Việt",
+    "start": "Bắt đầu hoạt động mất",
+    "error": "Phát hiện lỗi ở",
+    "noToken": "Không tìm thấy Token",
+    "test": "OK bot hoạt động mất",
+    "ytHelp": "có thể dùng theo cách:\n-yt <url>\n-yt <video-id>",
+    "langChange": "Chuyển ngôn ngữ sang"
+
+}

@@ -1,0 +1,9 @@
+{
+    "name": "English",
+    "start": "Start working took",
+    "error": "Found error at",
+    "noToken": "Can't find token on env",
+    "test": "OK bot start took",
+    "ytHelp": "can use:\n-yt <url>\n-yt <video-id>",
+    "langChange": "Change language to"
+}
