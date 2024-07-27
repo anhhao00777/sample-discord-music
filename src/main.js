@@ -37,22 +37,26 @@ client.on("ready", () => {
         path: `${__dirname}/saveFile/data.json`
     });
     // client.user.setStatus("dnd");
-    // let check = client.channels.cache.get("943845514091319346");
-    client.user.setActivity("AC", { Type: "PLAYING" });
+    client.user.setActivity("Void", { Type: "PLAYING" });
     console.log(`${config.start}: ${_totalTime}ms`);
     console.log(config["console-message"]);
     createRead();
     // embed()
     voiceManager.onended = () => {
         let i = isPlaying();
+        console.log("next")
         if(i!== false && i+1 < list.length){
             list[i].isPlaying = false;
             if(voiceManager.isConnect){
                 let url = list[i+1].url;
+                list[i+1].isPlaying = true;
                 let stream = getAudioStream(url);
                 voiceManager.setAudio(stream);
+                current = list[i+1];
                 list.shift();
             }
+        } else if(i!== false){
+            list.shift();
         }
     }
 });
@@ -144,7 +148,8 @@ async function inputMessage(message){
         let str = "";
         for (let i = 0; i < list.length; i++) {
             const e = list[i];
-            str += `[${i}] - [${secondsToTime(e.duration)}] ${e.name}\n`;
+            let param = e.isPlaying ? ">" : "";
+            str += `${param} [${i}] - [${secondsToTime(e.duration)}] ${e.name}\n`;
         }
         message.reply(str);
     }

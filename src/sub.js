@@ -38,7 +38,6 @@ class VoiceManager{
      * 
      */
     setAudio(stream){
-        if (this.isplaying) return false;
         this.player = this.Voice.createAudioPlayer();
         let resource = this.Voice.createAudioResource(stream);
         this.player.play(resource);
