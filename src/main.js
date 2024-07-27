@@ -4,7 +4,7 @@ import path from 'path';
 import ytdl from "@distube/ytdl-core";
 import * as Voice from "@discordjs/voice";
 import readline from "readline";
-
+// custom module
 import {VoiceManager, MessageLearner} from "./sub.js";
 const COMMAND = "-";
 const __dirname = path.resolve();
@@ -13,6 +13,7 @@ let _timeStart = Date.now();
 let _totalTime = 0;
 let list = [];
 let current = {};
+
 let config = JSON.parse(fs.readFileSync(`${__dirname}/text/${option.lang["0"]}.json`));
 console.log(__dirname);
 const readL = readline.createInterface({
@@ -20,6 +21,7 @@ const readL = readline.createInterface({
     output: process.stdout
 });
 
+// check is the token in .env
 if(!process.env.TOKEN){
     throw new Error(config.noToken);
 }
@@ -27,6 +29,7 @@ const client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent", "GuildVoiceStates", "GuildMembers"]
 });
 client.login(process.env.TOKEN);
+
 const voiceManager = new VoiceManager(Voice);
 let msgLearn;
 _totalTime = Date.now() - _timeStart;
@@ -41,7 +44,8 @@ client.on("ready", () => {
     console.log(`${config.start}: ${_totalTime}ms`);
     console.log(config["console-message"]);
     createRead();
-    // embed()
+
+    //after audio end
     voiceManager.onended = () => {
         let i = isPlaying();
         console.log("next")
@@ -61,6 +65,7 @@ client.on("ready", () => {
     }
 });
 
+
 function createRead(){
     readL.question(`${config.inputCommand}: `, (cmd) => {
         inputCmd(cmd);
@@ -76,6 +81,7 @@ function inputCmd(msg){
         voiceManager.disconnect();
     }
 }
+
 client.on("messageCreate", inputMessage);
 async function inputMessage(message){
     if (message.author.bot) return;
@@ -104,6 +110,7 @@ async function inputMessage(message){
         message.reply(config.testAudio);    
 
     }
+
     if(content.indexOf("yt ") !== -1){
         let text = content.split("yt ")[1]
         if(content.indexOf(" https://") !== -1){
@@ -140,6 +147,7 @@ async function inputMessage(message){
     } else if (content === "yt"){
         message.reply(config.ytHelp);
     }
+
     if(content == "list"){
         if(list.length === 0){
             message.reply(config.noList);
@@ -153,6 +161,7 @@ async function inputMessage(message){
         }
         message.reply(str);
     }
+    // vi or en default is en
     if(content.indexOf("lang ")!== -1){
         let lang = content.split("lang ")[1];
         if(lang === "vi"){
@@ -210,6 +219,7 @@ function getAudioStream(url){
     })
     return stream;
 }
+// 130 -> 00:02:10
 function secondsToTime(e = 0) {
     if(!e) e = 0;
     const h = Math.floor(e / 3600).toString().padStart(2, '0'),

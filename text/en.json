@@ -10,7 +10,7 @@
     "inputCommand": "Type command",
     "testAudio": "Playing to test voice...",
     "wait": "added to wait list because bot is playing",
-    "nolist": "There no any song at this list `-yt` to more infomation",
+    "noList": "There no any song at this list `-yt` to more infomation",
     "learnMode": "Type keyword for bot auto reply type -cancel to out this mode",
     "learnModeSec": "Type content for bot auto reply type -cancel to out this mode",
     "learnModeDone": "Done."

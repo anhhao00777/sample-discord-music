@@ -51,6 +51,13 @@ class VoiceManager{
 }
 
 class MessageLearner{
+    /**
+     * 
+     * @param {Discord.client} client 
+     * @param {Object} params option 
+     * @param {String} params.path option path to save file on this server 
+     * @param {Object} params.config language config 
+     */
     constructor(client, params = {}){
         this.client = client;
         this.path = params.path;
@@ -66,6 +73,10 @@ class MessageLearner{
             this.data = {};
         }
     }
+    /**
+     * 
+     * @param {Discord.Message} msg 
+     */
     set(msg){
         let userId = msg.author.id;
         if(!userId) return;
