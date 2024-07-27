@@ -218,7 +218,7 @@ function getAudioStream(url){
         highWaterMark: 1 << 27,
     })
     return stream;
-}
+} 
 // 130 -> 00:02:10
 function secondsToTime(e = 0) {
     if(!e) e = 0;

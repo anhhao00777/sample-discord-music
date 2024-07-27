@@ -56,7 +56,7 @@ class MessageLearner{
      * @param {Discord.client} client 
      * @param {Object} params option 
      * @param {String} params.path option path to save file on this server 
-     * @param {Object} params.config language config 
+     * @param {Object} params.config language config
      */
     constructor(client, params = {}){
         this.client = client;
