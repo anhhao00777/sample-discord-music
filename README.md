@@ -1,2 +1,5 @@
 # sample-discord-music
-test 
+test discord bot with node.js
+- use '-yt' for more info to use
+- can add custom reply message
+- update...
