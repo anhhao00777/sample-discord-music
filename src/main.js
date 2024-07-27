@@ -142,7 +142,7 @@ async function inputMessage(message){
     }
     if(content == "list"){
         if(list.length === 0){
-            message.reply(str);
+            message.reply(config.noList);
             return;
         }
         let str = "";
