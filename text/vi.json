@@ -5,6 +5,12 @@
     "noToken": "Không tìm thấy Token",
     "test": "OK bot hoạt động mất",
     "ytHelp": "có thể dùng theo cách:\n-yt <url>\n-yt <video-id>",
-    "langChange": "Chuyển ngôn ngữ sang"
+    "langChange": "Chuyển ngôn ngữ sang",
+    "console-message": "Bot đang hoạt động có thể gõ lệnh qua terminal",
+    "inputCommand": "Nhập lệnh",
+    "testAudio": "Chạy thử nhạc...",
+    "wait": "Thêm vào danh sách đợi do đang phát",
+    "nolist": "Không có bất kỳ bài hát nào `-yt` để biết thêm cách thêm"
+
 
 }

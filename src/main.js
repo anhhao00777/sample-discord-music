@@ -5,7 +5,7 @@ import ytdl from "@distube/ytdl-core";
 import * as Voice from "@discordjs/voice";
 import readline from "readline";
 
-import {VoiceManager} from "./sub.js";
+import {VoiceManager, MessageLearner} from "./sub.js";
 const COMMAND = "-";
 const __dirname = path.resolve();
 let option = JSON.parse(fs.readFileSync(`${__dirname}/saveFile/option.json`));
@@ -28,10 +28,14 @@ const client = new Discord.Client({
 });
 client.login(process.env.TOKEN);
 const voiceManager = new VoiceManager(Voice);
-
+let msgLearn;
 _totalTime = Date.now() - _timeStart;
 
 client.on("ready", () => {
+    msgLearn = new MessageLearner(client, {
+        config: config,
+        path: `${__dirname}/saveFile/data.json`
+    });
     // client.user.setStatus("dnd");
     // let check = client.channels.cache.get("943845514091319346");
     client.user.setActivity("AC", { Type: "PLAYING" });
@@ -39,6 +43,18 @@ client.on("ready", () => {
     console.log(config["console-message"]);
     createRead();
     // embed()
+    voiceManager.onended = () => {
+        let i = isPlaying();
+        if(i!== false && i+1 < list.length){
+            list[i].isPlaying = false;
+            if(voiceManager.isConnect){
+                let url = list[i+1].url;
+                let stream = getAudioStream(url);
+                voiceManager.setAudio(stream);
+                list.shift();
+            }
+        }
+    }
 });
 
 function createRead(){
@@ -59,6 +75,7 @@ function inputCmd(msg){
 client.on("messageCreate", inputMessage);
 async function inputMessage(message){
     if (message.author.bot) return;
+    msgLearn.update(message);
     let {content} = message;
     if (content.startsWith(COMMAND)) {
         content = content.slice(1);
@@ -72,6 +89,9 @@ async function inputMessage(message){
     }
     if(content === "out"){
         voiceManager.disconnect();
+    }
+    if(content === "learn"){
+        msgLearn.set(message);
     }
     if(content === "test"){
         let stream = `${__dirname}/ss.mp3`;
@@ -87,12 +107,11 @@ async function inputMessage(message){
             let info = await getInfo(url);
             voiceManager.connect(message.member);
             let stream = getAudioStream(url);
-            if(!isPlaying()){
+            if(isPlaying() === false){
                 info.isPlaying = true;
             } else{
                 message.reply(`${config.wait}: ${current.name}`); 
                 return;
-
             }
             current = info;    
             voiceManager.setAudio(stream);
@@ -104,12 +123,11 @@ async function inputMessage(message){
             voiceManager.connect(message.member);
             // let stream = `${__dirname}/ss.mp3`;
             let stream = getAudioStream(url);
-            if(!isPlaying()){
+            if(isPlaying() === false){
                 info.isPlaying = true;
             } else{
                 message.reply(`${config.wait}: ${current.name}`); 
                 return;
-
             }
             current = info;
             voiceManager.setAudio(stream);
@@ -119,10 +137,14 @@ async function inputMessage(message){
         message.reply(config.ytHelp);
     }
     if(content == "list"){
+        if(list.length === 0){
+            message.reply(str);
+            return;
+        }
         let str = "";
         for (let i = 0; i < list.length; i++) {
             const e = list[i];
-            str += `[${i}] - [${e.duration}] ${e.name}\n`;
+            str += `[${i}] - [${secondsToTime(e.duration)}] ${e.name}\n`;
         }
         message.reply(str);
     }
@@ -147,7 +169,7 @@ function isPlaying(){
     for (let i = 0; i < list.length; i++) {
         const e = list[i];
         if(e.isPlaying === true){
-            return true
+            return i;
         }
     }
     return false;
@@ -182,4 +204,11 @@ function getAudioStream(url){
         highWaterMark: 1 << 27,
     })
     return stream;
+}
+function secondsToTime(e = 0) {
+    if(!e) e = 0;
+    const h = Math.floor(e / 3600).toString().padStart(2, '0'),
+        m = Math.floor(e % 3600 / 60).toString().padStart(2, '0'),
+        s = Math.floor(e % 60).toString().padStart(2, '0');
+    return (h + ':' + m + ':' + s);
 }
