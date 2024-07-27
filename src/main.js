@@ -2,14 +2,23 @@ import Discord from "discord.js";
 import fs from "fs";
 import path from 'path';
 import ytdl from "@distube/ytdl-core";
+import * as Voice from "@discordjs/voice";
+import readline from "readline";
+
 import {VoiceManager} from "./sub.js";
+const COMMAND = "-";
 const __dirname = path.resolve();
 let option = JSON.parse(fs.readFileSync(`${__dirname}/saveFile/option.json`));
 let _timeStart = Date.now();
 let _totalTime = 0;
 let list = [];
+let current = {};
 let config = JSON.parse(fs.readFileSync(`${__dirname}/text/${option.lang["0"]}.json`));
 console.log(__dirname);
+const readL = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 if(!process.env.TOKEN){
     throw new Error(config.noToken);
@@ -18,7 +27,7 @@ const client = new Discord.Client({
     intents: ["Guilds", "GuildMessages", "MessageContent", "GuildVoiceStates", "GuildMembers"]
 });
 client.login(process.env.TOKEN);
-const voiceManager = new VoiceManager(client);
+const voiceManager = new VoiceManager(Voice);
 
 _totalTime = Date.now() - _timeStart;
 
@@ -27,58 +36,122 @@ client.on("ready", () => {
     // let check = client.channels.cache.get("943845514091319346");
     client.user.setActivity("AC", { Type: "PLAYING" });
     console.log(`${config.start}: ${_totalTime}ms`);
+    console.log(config["console-message"]);
+    createRead();
     // embed()
 });
 
-client.on("messageCreate", async (message) => {
+function createRead(){
+    readL.question(`${config.inputCommand}: `, (cmd) => {
+        inputCmd(cmd);
+        setTimeout(()=> createRead(),3000);
+        
+    });
+}
+
+function inputCmd(msg){
+    if(msg === "-list"){
+        console.log(JSON.stringify(list));
+    } if(msg === "-disconnect"){
+        voiceManager.disconnect();
+    }
+}
+client.on("messageCreate", inputMessage);
+async function inputMessage(message){
     if (message.author.bot) return;
     let {content} = message;
+    if (content.startsWith(COMMAND)) {
+        content = content.slice(1);
+    } else{
+        return;
+    }
+
     if(content === "."){
         message.reply(`${config.test}: ${_totalTime}ms`);
         console.log(message)
     }
-    if(content === "-out"){
+    if(content === "out"){
         voiceManager.disconnect();
     }
-    if(content.indexOf("-yt ") !== -1){
-        let text = content.split("-yt ")[1]
+    if(content === "test"){
+        let stream = `${__dirname}/ss.mp3`;
+        voiceManager.connect(message.member);
+        voiceManager.setAudio(fs.createReadStream(stream));
+        message.reply(config.testAudio);    
+
+    }
+    if(content.indexOf("yt ") !== -1){
+        let text = content.split("yt ")[1]
         if(content.indexOf(" https://") !== -1){
             let url = text;
             let info = await getInfo(url);
             voiceManager.connect(message.member);
             let stream = getAudioStream(url);
+            if(!isPlaying()){
+                info.isPlaying = true;
+            } else{
+                message.reply(`${config.wait}: ${current.name}`); 
+                return;
+
+            }
+            current = info;    
             voiceManager.setAudio(stream);
             message.reply(JSON.stringify(info));
         } else if(text.length == 11){
             let id = text;
-            // let info = await getInfo(id);
+            let info = await getInfo(id);
             let url = `https://www.youtube.com/watch?v=${id}`;
             voiceManager.connect(message.member);
-            let stream = `${__dirname}/ss.mp3`;
-            // let stream = getAudioStream(url);
-            voiceManager.setAudio(fs.createReadStream(stream));
-            message.reply("ok");    
+            // let stream = `${__dirname}/ss.mp3`;
+            let stream = getAudioStream(url);
+            if(!isPlaying()){
+                info.isPlaying = true;
+            } else{
+                message.reply(`${config.wait}: ${current.name}`); 
+                return;
+
+            }
+            current = info;
+            voiceManager.setAudio(stream);
+            message.reply(JSON.stringify(info));    
         }
-    } else if (content === "-yt"){
+    } else if (content === "yt"){
         message.reply(config.ytHelp);
     }
-    if(content.indexOf("-lang ")!== -1){
-        let lang = content.split("-lang ")[1];
+    if(content == "list"){
+        let str = "";
+        for (let i = 0; i < list.length; i++) {
+            const e = list[i];
+            str += `[${i}] - [${e.duration}] ${e.name}\n`;
+        }
+        message.reply(str);
+    }
+    if(content.indexOf("lang ")!== -1){
+        let lang = content.split("lang ")[1];
         if(lang === "vi"){
             config = JSON.parse(fs.readFileSync(`${__dirname}/text/vi.json`));
             option.lang["0"] = lang;
-            message.reply(`${config.langChange}: ${lang}`);
+            message.reply(`${config.langChange}: ${config.name}`);
 
         } else{
             config = JSON.parse(fs.readFileSync(`${__dirname}/text/en.json`));
             option.lang["0"] = lang;
-            message.reply(`${config.langChange}: ${lang}`);
+            message.reply(`${config.langChange}: ${config.name}`);
 
         }
         saveOption();
     }
-});
+}
 
+function isPlaying(){
+    for (let i = 0; i < list.length; i++) {
+        const e = list[i];
+        if(e.isPlaying === true){
+            return true
+        }
+    }
+    return false;
+}
 function getInfo(yt) {
     return new Promise(async (resolve, reject) => {
         if (!yt) return;

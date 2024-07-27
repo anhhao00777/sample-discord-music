@@ -5,5 +5,9 @@
     "noToken": "Can't find token on env",
     "test": "OK bot start took",
     "ytHelp": "can use:\n-yt <url>\n-yt <video-id>",
-    "langChange": "Change language to"
+    "langChange": "Change language to",
+    "console-message": "Bot is working type bot command or -list to get auudio list",
+    "inputCommand": "Type command",
+    "testAudio": "Playing to test voice...",
+    "wait": "added to wait list because bot is playing"
 }
