@@ -10,7 +10,10 @@
     "inputCommand": "Nhập lệnh",
     "testAudio": "Chạy thử nhạc...",
     "wait": "Thêm vào danh sách đợi do đang phát",
-    "nolist": "Không có bất kỳ bài hát nào `-yt` để biết thêm cách thêm"
+    "nolist": "Không có bất kỳ bài hát nào `-yt` để biết thêm cách thêm",
+    "learnMode": "Type keyword for bot auto reply type -cancel to out this mode",
+    "learnModeSec": "Type content for bot auto reply type -cancel to out this mode",
+    "learnModeDone": "Done."
 
 
 }

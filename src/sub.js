@@ -20,6 +20,7 @@ class VoiceManager{
     connect(user){
         if(this.isConnect) return false;
         let voice = user.voice.channel;
+        if(!user.voice) return false;
         this.connection = this.Voice.joinVoiceChannel({
             channelId: voice.id,
             guildId: voice.guild.id,
